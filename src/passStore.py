@@ -2,6 +2,7 @@ import passStoreFunc as fs
 import tfa
 import os
 import func as fc
+import shutil
 
 
 def main():
@@ -62,10 +63,18 @@ def main():
                 else:
                     print("Two factor authentication has already been setup if you wish to reset your 2FA please choose"
                           " option 4")
+            elif choice == 4:
+                resop=input("Do you want to reset y/n").lower()
+                if resop=="y":
+                    shutil.rmtree('fileData')
+                elif resop=="n":
+                    print("Reset has been cancelled")
+                else:
+                    print("Invalid option")
 
             elif choice == 5:
                 Suggestions=fc.Genstrongpass()
-                print(f"Here are some suggestions{Suggestions}")
+                print(f"Strong Password: {Suggestions}")
 
             elif choice == 6:
                 break
