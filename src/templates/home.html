@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Welcome to Password Manager</h1>
+    <button onclick="window.location.href='/add'">Add Password</button>
+    <button onclick="window.location.href='/retrieve'">Retrieve Password</button>
+    <form action="/setup_2fa" method="POST" style="display: inline;">
+        <button type="submit">Setup 2FA</button>
+    </form>
+    <form action="/reset_2fa" method="POST" style="display: inline;">
+        <button type="submit" name="response" value="y">Reset 2FA</button>
+    </form>
+    <button onclick="window.location.href='/generate_password'">Generate Strong Password</button>
+</body>
+</html>
