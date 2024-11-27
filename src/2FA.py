@@ -1,59 +1,95 @@
 import pyotp
 import qrcode
-
 import os
-import base64
+import json
 
 
-# 1. Generate a Secret Key for a New User
+# Directory to store secrets and QR codes
+DATA_DIR = os.path.join(os.getcwd(), "data")
+SECRETS_FILE = os.path.join(DATA_DIR, "secrets.json")
+
+
+def ensure_data_directory():
+    """Ensure the data directory exists."""
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+
+
+def load_secrets():
+    """Load secrets from a file."""
+    ensure_data_directory()
+    if os.path.exists(SECRETS_FILE):
+        with open(SECRETS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def save_secrets(secrets):
+    """Save secrets to a file."""
+    ensure_data_directory()
+    with open(SECRETS_FILE, "w") as f:
+        json.dump(secrets, f)
+
+
 def generate_2fa_secret(user_identifier):
-    # Create a unique base32 secret
-    secret = pyotp.random_base32()
-    print(f"Secret for {user_identifier}: {secret}")
+    """Generate a new secret for the user."""
+    secrets = load_secrets()
 
-    # Save or associate this secret with the user's account in your database
+    if user_identifier in secrets:
+        print(f"Secret for {user_identifier} already exists.")
+        return secrets[user_identifier]
+
+    secret = pyotp.random_base32()
+    secrets[user_identifier] = secret
+    save_secrets(secrets)
+
+    print(f"New secret generated for {user_identifier}: {secret}")
     return secret
 
 
-# 2. Generate a QR Code for Enrollment
 def generate_qr_code(secret, user_identifier, issuer_name="MyPasswordManager"):
+    """Generate a QR code for the user."""
+    # Generate the provisioning URI
     uri = pyotp.totp.TOTP(secret).provisioning_uri(
         name=user_identifier,
         issuer_name=issuer_name
     )
+
+    # Determine the file path
+    ensure_data_directory()
+    qr_file = os.path.join(DATA_DIR, f"{user_identifier}_2fa_qr.png")
+
+    # Check if the file already exists
+    if os.path.exists(qr_file):
+        print(f"QR Code for {user_identifier} already exists at {qr_file}.")
+        return qr_file
+
+    # Generate and save the QR code
     qr = qrcode.make(uri)
-    qr_file =  os.path.join("D:\\Qr_codes", f"{user_identifier}_2fa_qr.png")
     qr.save(qr_file)
     print(f"QR Code generated and saved as {qr_file}")
     return qr_file
 
 
-
-
-# 3. Validate OTP During Login
 def validate_otp(secret, user_provided_otp):
+    """Validate the OTP provided by the user."""
     totp = pyotp.TOTP(secret)
     return totp.verify(user_provided_otp)
 
 
-
-
-
-# Full Integration Example
-if __name__ == "__main__":
+def two_factor_auth():
     print("Two-Factor Authentication")
-    user_email = input("Enter your email to set up 2FA: ")
+    user_email = input("Enter your email to authenticate 2FA: ")
 
-    # Step 1: Generate Secret and QR Code
+    # Step 1: Retrieve or Generate Secret and QR Code
     secret = generate_2fa_secret(user_email)
     qr_file = generate_qr_code(secret, user_email)
 
     print("\nScan the QR Code using an authenticator app (e.g., Google Authenticator).")
-    print("The QR Code has been saved to your device.")
-    i = 0
+    print(f"The QR Code is located at: {qr_file}")
+
     # Step 2: OTP Validation
-    while (i < 3):
-        print("\nNow, let's validate your OTP.")
+    for i in range(3):
         user_otp = input("Enter the OTP from your authenticator app: ")
 
         if validate_otp(secret, user_otp):
@@ -61,4 +97,9 @@ if __name__ == "__main__":
             break
         else:
             print("Invalid OTP. Please try again.")
-        i = i+1
+    else:
+        print("Failed to validate OTP after 3 attempts.")
+
+
+if __name__ == "__main__":
+    two_factor_auth()
