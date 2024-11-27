@@ -1,46 +1,54 @@
 import passStoreFunc as fs
 import os
-
+import func as fc
 
 def main():
-    if not os.path.exists('fileData/secret.key'):
-        fs.generate_key()
 
-    while True:
-        choice = int(input("Would you like to\n 1.Add\n 2.Retrieve\n 3.Quit \n"))
+        if not os.path.exists('fileData/secret.key'):
+            fs.generate_key()
 
-        if choice == 1:
-            # code add a new password
-            website = input("Enter the website: ")
-            username = input("Enter the username: ")
-            password = input("Enter the password: ")
-            encrypted_password = fs.encrypt_data(password)
+        while True:
+            choice = int(input("Would you like to\n 1.Add\n 2.Retrieve\n 3.Quit \n"))
 
-            # code to save the password details
-            fs.save_password(website, username, encrypted_password)
-            print(f"Password for {website} has been added.")
+            if choice == 1:
+                # code add a new password
+                website = input("Enter the website: ")
+                username = input("Enter the username: ")
+                while True:
+                    password = input("Enter the password: ")
+                    strenghtreturn = fc.check_strength(password)
+                    if (strenghtreturn is True):
+                        encrypted_password = fs.encrypt_data(password)
+                        # code to save the password details
+                        fs.save_password(website, username, encrypted_password)
+                        print(f"Password for {website} has been added.")
+                        break
+                    else:
+                        print(f"The password is weak.")
+                        print("Try a new password")
 
-        elif choice == 2:
-            # retrieve a password
-            website = input("Enter the website to retrieve: ")
-            passwords = fs.load_passwords()
-            found = False
 
-            for entry in passwords:
-                if entry[0] == website:
-                    decrypted_password = fs.decrypt_data(entry[2].encode())
-                    print(f"Username: {entry[1]}, Password: {decrypted_password}")
-                    found = True
-                    break
+            elif choice == 2:
+                # retrieve a password
+                website = input("Enter the website to retrieve: ")
+                passwords = fs.load_passwords()
+                found = False
 
-            if not found:
-                print("No password found for that website.")
+                for entry in passwords:
+                    if entry[0] == website:
+                        decrypted_password = fs.decrypt_data(entry[2].encode())
+                        print(f"Username: {entry[1]}, Password: {decrypted_password}")
+                        found = True
+                        break
 
-        elif choice == 3:
-            break
+                if not found:
+                    print("No password found for that website.")
 
-        else:
-            print("Invalid option. Please choose 1,2,or 3")
+            elif choice == 3:
+                break
+
+            else:
+                print("Invalid option. Please choose 1,2,or 3")
 
 
 main()

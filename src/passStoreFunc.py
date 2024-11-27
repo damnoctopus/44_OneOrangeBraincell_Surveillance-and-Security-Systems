@@ -1,14 +1,22 @@
 from cryptography.fernet import Fernet
 import os
 
+import os
+from cryptography.fernet import Fernet
+
+
 def generate_key():
-    #key generation
+    # Ensure the directory exists
+    os.makedirs('fileData', exist_ok=True)
+
+    # Generate and save the key
     key = Fernet.generate_key()
     with open('fileData/secret.key', 'wb') as key_file:
         key_file.write(key)
 
+
 def load_key():
-    #loading key to ram
+    # Ensure the key file exists
     if not os.path.exists('fileData/secret.key'):
         raise FileNotFoundError("Key file not found. Please generate a key first.")
     return open('fileData/secret.key', 'rb').read()
