@@ -2,6 +2,7 @@ import pyotp
 import qrcode
 import os
 import json
+from tkinter import messagebox, simpledialog
 
 
 # Directory to store secrets and QR codes
@@ -36,14 +37,14 @@ def generate_2fa_secret(user_identifier):
     secrets = load_secrets()
 
     if user_identifier in secrets:
-        print(f"Secret for {user_identifier} already exists.")
+        messagebox.showerror("Error", f"Secret for {user_identifier} already exists.")
         return secrets[user_identifier]
 
     secret = pyotp.random_base32()
     secrets[user_identifier] = secret
     save_secrets(secrets)
 
-    print(f"New secret generated for {user_identifier}: {secret}")
+    messagebox.showinfo("Success", f"New secret generated for {user_identifier}: {secret}")
     return secret
 
 
@@ -61,14 +62,12 @@ def generate_qr_code(secret, user_identifier, issuer_name="MyPasswordManager"):
 
     # Check if the file already exists
     if os.path.exists(qr_file):
-        print(f"QR Code for {user_identifier} already exists at {qr_file}.")
+        messagebox.showinfo("Error", f"QR Code for {user_identifier} already exists at {qr_file}.")
         return qr_file
 
     # Generate and save the QR code
     qr = qrcode.make(uri)
     qr.save(qr_file)
-    print(f"QR Code generated and saved as {qr_file}")
-    print("\nScan the QR Code using an authenticator app (e.g., Google Authenticator).")
     return qr_file
 
 
@@ -77,8 +76,6 @@ def validate_otp(secret, user_provided_otp):
     totp = pyotp.TOTP(secret)
     return totp.verify(user_provided_otp)
 
-
-import os
 
 def two_factor_auth():
     print("Two-Factor Authentication")
