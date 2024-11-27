@@ -64,7 +64,7 @@ def main():
                     print("Two factor authentication has already been setup if you wish to reset your 2FA please choose"
                           " option 4")
             elif choice == 4:
-                resop=input("Do you want to reset y/n").lower()
+                resop=input("Do you want to reset y/n \n").lower()
                 if resop=="y":
                     shutil.rmtree('fileData')
                 elif resop=="n":
