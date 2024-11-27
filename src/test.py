@@ -184,8 +184,6 @@ def reset_2fa():
 def generate_strong_password():
 
     strong_pass = fc.Genstrongpass()
-    # print to console
-    print(strong_pass)
     # Display the password in a message box
     messagebox.showinfo("Generated Password", f"Your strong password is:\n{strong_pass}")
 
