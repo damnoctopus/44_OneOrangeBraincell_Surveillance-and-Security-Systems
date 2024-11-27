@@ -88,7 +88,28 @@ def retrieve_password():
 
 def setup_2fa():
     # Add functionality to setup 2FA here
-    messagebox.showinfo("Setup 2FA", "Setup 2FA functionality placeholder.")
+    global factor_setup  # Access the global variable to modify it
+
+    if not factor_setup:
+        confirm = messagebox.askyesno("Set Up 2FA",
+                                      "Two-factor authentication is not set up. Would you like to set it up now?")
+        if confirm:
+            try:
+                factor_setup = tfa.two_factor_auth()  # Set up 2FA
+                messagebox.showinfo("Success", "Two-factor authentication has been set up.")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred while setting up 2FA:\n{str(e)}")
+    else:
+        confirm = messagebox.askyesno("Reset 2FA",
+                                      "Two-factor authentication is already set up. Would you like to reset it?")
+        if confirm:
+            try:
+                factor_setup = tfa.two_factor_auth()  # Reset 2FA
+                messagebox.showinfo("Success", "Two-factor authentication has been reset.")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred while resetting 2FA:\n{str(e)}")
+        else:
+            messagebox.showinfo("No Action Taken", "2FA setup remains unchanged.")
 
 
 def reset_2fa():
@@ -127,7 +148,7 @@ factor_setup = False
 root = tk.Tk()
 root.title("Password Manager Menu")
 
-tk.Label(root, text="Welcome to PassStore", font=("Arial", 16)).pack(pady=10)
+tk.Label(root, text="Welcome to PassManager", font=("Arial", 16)).pack(pady=10)
 
 tk.Button(root, text="1. Add Password", command=add_password, width=30).pack(pady=5)
 tk.Button(root, text="2. Retrieve Password", command=retrieve_password, width=30).pack(pady=5)
