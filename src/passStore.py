@@ -1,14 +1,18 @@
 import passStoreFunc as fs
+import tfa
 import os
 import func as fc
+
 
 def main():
         factorauth = True
         if not os.path.exists('fileData/secret.key'):
             fs.generate_key()
+        factor_setup = False
 
         while True:
-            choice = int(input("Would you like to\n 1.Add\n 2.Retrieve\n 3.Setup 2FA \n 4.Quit \n"))
+            choice = int(input("Would you like to\n 1.Add\n 2.Retrieve\n 3.Setup 2FA \n 4.Reset 2FA \n "
+                               "5.Generate strong password \n 6.Quit \n"))
 
             if choice == 1:
                 # code add a new password
@@ -49,8 +53,19 @@ def main():
                     print("2Factor Authentication not passed ")
 
             elif choice == 3:
-                print("hehe")
-            elif choice == 4:
+                if factor_setup is False:
+                    factor_setup = tfa.two_factor_auth()
+                    print("Two factor authentication has been setup")
+                    break
+                else:
+                    print("Two factor authentication has already been setup if you wish to reset your 2FA please choose"
+                          " option 4")
+
+            elif choice == 5:
+                Suggestions=fc.Genstrongpass()
+                print(f"Here are some suggestions{Suggestions}")
+
+            elif choice == 6:
                 break
 
             else:

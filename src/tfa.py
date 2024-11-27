@@ -94,11 +94,12 @@ def two_factor_auth():
 
         if validate_otp(secret, user_otp):
             print("OTP Verified! Two-Factor Authentication setup is successful.")
-            break
+            return True
         else:
             print("Invalid OTP. Please try again.")
     else:
         print("Failed to validate OTP after 3 attempts.")
+        return False
 
 
 if __name__ == "__main__":
