@@ -110,7 +110,7 @@ def two_factor_auth():
                 for entry in encData:
                     if entry[0] == test.webshite:
                         decrypted_password = fs.decrypt_data(entry[2].encode())
-                        print(f"Username: {entry[1]}, Password: {decrypted_password}")
+                        messagebox.showinfo("Found", f"Username: {entry[1]}, Password: {decrypted_password}")
                 messagebox.showinfo("Credentials", f"")
 
             else:
