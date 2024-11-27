@@ -152,8 +152,7 @@ def setup_2fa():
                 if tfa.validate_otp(secret, user_otp):
                     messagebox.showinfo("Success", "Successfully authenticated.")
                     factor_setup = True  # Update the global variable
-                    if not os.path.exists(file_path2):
-                        qr_window.destroy()
+                    qr_window.destroy()
                     return
                 else:
                     messagebox.showerror("Error", f"Invalid OTP. Attempt {i+1}/3.")
@@ -172,6 +171,8 @@ def reset_2fa():
         try:
             fs.reset2fa()  # Call the reset2fa function
             messagebox.showinfo("Success", "2FA has been reset successfully.")
+            global factor_setup
+            factor_setup = False
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred while resetting 2FA:\n{str(e)}")
     else:
