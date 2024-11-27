@@ -23,8 +23,7 @@ def home():
 # Add Password
 @app.route('/add', methods=['GET', 'POST'])
 def add_password():
-    @app.route('/add_password', methods=['POST'])
-    def add_password():
+    if request.method == 'POST':
         from google.generativeai import configure, GenerativeModel
 
         # Configure the Google Generative AI model
@@ -32,10 +31,9 @@ def add_password():
         model = GenerativeModel("gemini-1.5-flash")
 
         # Retrieve user input from the form
-        data = request.json
-        website = data.get("website")
-        username = data.get("username")
-        password = data.get("password")
+        website = request.form.get("website")
+        username = request.form.get("username")
+        password = request.form.get("password")
 
         try:
             # Call the model to evaluate password strength
@@ -74,6 +72,8 @@ def add_password():
 
         except Exception as e:
             return jsonify({"error": f"An error occurred: {e}"}), 500
+    else:
+        return render_template('add.html')  # Render the add password form page
 
 
 
@@ -104,6 +104,7 @@ def retrieve_password():
 # Setup 2FA
 @app.route('/setup_2fa', methods=['POST'])
 def setup_2fa():
+    return render_template('setup_f2a.html')
     if tfa.two_factor_auth():
         return jsonify({"message": "Two-Factor Authentication setup successful."})
     return jsonify({"message": "Failed to setup 2FA."})
