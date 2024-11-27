@@ -8,7 +8,8 @@ import pyotp
 import qrcode
 from PIL import Image, ImageTk
 
-webshite = 1
+factor_setup = False
+
 def add_password():
     def save_password():
         website = website_entry.get()
@@ -50,52 +51,53 @@ def add_password():
 
 
 def retrieve_password():
-    def fetch_password():
-        global webshite
-        webshite = website_entry.get()
+    global factor_setup
 
-        if not webshite:
-            messagebox.showerror("Error", "Website is required!")
-            return
+    if factor_setup is True:  # Check if 2FA is set up
+        # Create a new top-level window for password retrieval
+        retrieve_window = tk.Toplevel(root)
+        retrieve_window.title("Retrieve Password")
 
-        found = False
+        # Label and Entry widget to input website
+        tk.Label(retrieve_window, text="Website:").grid(row=0, column=0, padx=10, pady=5)
+        website_entry = tk.Entry(retrieve_window)
+        website_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        if factor_setup is True:
-            factor_verify = tfa.two_factor_auth()
-            if factor_verify:
-                passwords = fs.load_passwords()
+        # Function to fetch password
+        def fetch_password():
+            website = website_entry.get()  # Get the text entered in the Entry widget
 
-                for entry in passwords:
-                    if entry[0] == webshite:
-                        decrypted_password = fs.decrypt_data(entry[2].encode())
-                        messagebox.showwarning("User Details", f"Username: {entry[1]}, Password: {decrypted_password}")
-                        found = True
-                        break
+            if not website:
+                messagebox.showerror("Error", "Website is required!")
+                return
 
-                if not found:
-                    messagebox.showwarning("Not Found", "No password found for that website.")
-                    retrieve_window.destroy()
-            else:
-                messagebox.showwarning("Auth Error", "Failed to verify User.")
-                retrieve_window.destroy()
+            # Assuming fs.load_passwords() loads a list of passwords
+            passwords = fs.load_passwords()
+            found = False
 
-        else:
-            messagebox.showwarning("Auth Error", "Two factor authentication not setup.")
-            retrieve_window.destroy()
-    retrieve_window = tk.Toplevel(root)
-    retrieve_window.title("Retrieve Password")
+            # Search for the password associated with the entered website
+            for entry in passwords:
+                if entry[0] == website:  # Compare with website
+                    decrypted_password = fs.decrypt_data(entry[2].encode())  # Decrypt the password
+                    messagebox.showinfo("Found", f"Username: {entry[1]}, Password: {decrypted_password}")
+                    found = True
+                    break
 
-    tk.Label(retrieve_window, text="Website:").grid(row=0, column=0, padx=10, pady=5)
-    website_entry = tk.Entry(retrieve_window)
-    website_entry.grid(row=0, column=1, padx=10, pady=5)
+            if not found:
+                messagebox.showerror("Error", "No password found for that website.")
 
-    tk.Button(retrieve_window, text="Retrieve", command=fetch_password).grid(row=1, column=0, columnspan=2, pady=10)
+        # Button to trigger password retrieval
+        tk.Button(retrieve_window, text="Retrieve", command=fetch_password).grid(row=1, column=0, columnspan=2, pady=10)
+
+    else:
+        messagebox.showerror("Error", "Two-factor authentication is not set up.")
 
 
 def setup_2fa():
     global factor_setup  # Access the global 2FA setup state
 
     if not factor_setup:
+        # Ask the user if they want to set up 2FA
         confirm = messagebox.askyesno(
             "Set Up 2FA",
             "Two-factor authentication is not set up. Would you like to set it up now?"
@@ -113,13 +115,15 @@ def setup_2fa():
             # Check or store the user email
             file_path = "fileData/user.txt"
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
             if os.path.exists(file_path):
                 with open(file_path, "r") as file:
-                    stored_email = file.read()
+                    stored_email = file.read().strip()
                 if user_email != stored_email:
                     messagebox.showerror("Error", "Email does not match the stored user.")
                     return
             else:
+                # Store the email if not already present
                 with open(file_path, "w") as file:
                     file.write(user_email)
 
@@ -144,7 +148,7 @@ def setup_2fa():
                 user_otp = simpledialog.askstring("OTP", "Enter the OTP from your authenticator app:")
                 if tfa.validate_otp(secret, user_otp):
                     messagebox.showinfo("Success", "Two-factor authentication has been set up successfully!")
-                    factor_setup = True
+                    factor_setup = True  # Update the global variable
                     qr_window.destroy()
                     return
                 else:
@@ -157,7 +161,6 @@ def setup_2fa():
             messagebox.showerror("Error", f"An error occurred while setting up 2FA:\n{str(e)}")
     else:
         messagebox.showinfo("Info", "Two-factor authentication is already set up.")
-
 
 def reset_2fa():
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset 2FA?")
