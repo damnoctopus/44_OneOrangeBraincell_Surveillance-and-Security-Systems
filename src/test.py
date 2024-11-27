@@ -16,13 +16,16 @@ def add_password():
             messagebox.showerror("Error", "All fields are required!")
             return
 
-        if fc.check_strength(password):
+        strength_return = fc.check_strength(password)
+        if strength_return is True:
             encrypted_password = fs.encrypt_data(password)
+            # code to save the password details
             fs.save_password(website, username, encrypted_password)
             messagebox.showinfo("Success", f"Password for {website} has been added.")
             add_window.destroy()
         else:
-            messagebox.showwarning("Weak Password", "The password is weak. Please try again.")
+            messagebox.showerror("Weak password", "Please enter a stronger password.")
+            password_entry.delete(0, tk.END)
 
     add_window = tk.Toplevel(root)
     add_window.title("Add Password")
@@ -40,6 +43,7 @@ def add_password():
     password_entry.grid(row=2, column=1, padx=10, pady=5)
 
     tk.Button(add_window, text="Save", command=save_password).grid(row=3, column=0, columnspan=2, pady=10)
+
 
 def retrieve_password():
     def fetch_password():
@@ -72,9 +76,6 @@ def retrieve_password():
         else:
             messagebox.showwarning("Auth Error", "Two factor authentication not setup.")
             retrieve_window.destroy()
-
-
-
     retrieve_window = tk.Toplevel(root)
     retrieve_window.title("Retrieve Password")
 
@@ -84,9 +85,11 @@ def retrieve_password():
 
     tk.Button(retrieve_window, text="Retrieve", command=fetch_password).grid(row=1, column=0, columnspan=2, pady=10)
 
+
 def setup_2fa():
     # Add functionality to setup 2FA here
     messagebox.showinfo("Setup 2FA", "Setup 2FA functionality placeholder.")
+
 
 def reset_2fa():
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset 2FA?")
@@ -99,14 +102,14 @@ def reset_2fa():
     else:
         messagebox.showinfo("Cancelled", "2FA reset was cancelled.")
 
+
 def generate_strong_password():
 
     strong_pass = fc.Genstrongpass()
-    #print to console
+    # print to console
     print(strong_pass)
     # Display the password in a message box
     messagebox.showinfo("Generated Password", f"Your strong password is:\n{strong_pass}")
-
 
 
 def quit_app():
