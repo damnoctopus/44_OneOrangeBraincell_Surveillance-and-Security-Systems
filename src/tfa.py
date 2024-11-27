@@ -5,7 +5,7 @@ import json
 
 
 # Directory to store secrets and QR codes
-DATA_DIR = os.path.join(os.getcwd(), "data")
+DATA_DIR = os.path.join(os.getcwd(), "fileData")
 SECRETS_FILE = os.path.join(DATA_DIR, "secrets.json")
 
 
