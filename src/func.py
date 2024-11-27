@@ -14,7 +14,6 @@ def check_strength(password):
             - At least 8 characters
             - Uppercase and lowercase letters
             - Numbers and symbols included
-            - Avoids easily guessable patterns
             Password: {password}
             Return ONLY "true" if the password is strong, or "false" if the password is weak.
             Additionally, suggest stronger passwords if the password is weak. Limit response to 50 words.
