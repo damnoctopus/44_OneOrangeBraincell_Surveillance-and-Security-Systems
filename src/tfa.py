@@ -2,7 +2,9 @@ import pyotp
 import qrcode
 import os
 import tkinter as tk
+import passStoreFunc as fs
 import json
+import test
 from tkinter import messagebox, simpledialog
 
 
@@ -95,18 +97,22 @@ def two_factor_auth():
             # Store the user_email in the file
             with open('fileData/user.txt', 'w') as file:
                 file.write(user_name)
-
-        # Step 1: Retrieve or Generate Secret and QR Code
-        secret = generate_2fa_secret(user_name)
-        qr_file = generate_qr_code(secret, user_name)
+            # Step 1: Retrieve or Generate Secret and QR Code
+            secret = generate_2fa_secret(user_name)
+            qr_file = generate_qr_code(secret, user_name)
 
         # Step 2: OTP Validation
         for i in range(3):
             user_otp = otp_entry.get()  # Get OTP from the entry field
 
             if validate_otp(secret, user_otp):
-                messagebox.showinfo("Success", "OTP Verified! Two-Factor has been Authenticated.")
-                return True
+                encData = fs.load_passwords()
+                for entry in encData:
+                    if entry[0] == test.webshite:
+                        decrypted_password = fs.decrypt_data(entry[2].encode())
+                        print(f"Username: {entry[1]}, Password: {decrypted_password}")
+                messagebox.showinfo("Credentials", f"")
+
             else:
                 messagebox.showwarning("Invalid OTP", "Invalid OTP. Please try again.")
         else:

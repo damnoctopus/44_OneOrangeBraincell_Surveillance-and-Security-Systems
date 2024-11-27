@@ -8,7 +8,7 @@ import pyotp
 import qrcode
 from PIL import Image, ImageTk
 
-
+webshite = 1
 def add_password():
     def save_password():
         website = website_entry.get()
@@ -51,20 +51,22 @@ def add_password():
 
 def retrieve_password():
     def fetch_password():
-        website = website_entry.get()
+        global webshite
+        webshite = website_entry.get()
 
-        if not website:
+        if not webshite:
             messagebox.showerror("Error", "Website is required!")
             return
+
+        found = False
 
         if factor_setup is True:
             factor_verify = tfa.two_factor_auth()
             if factor_verify:
                 passwords = fs.load_passwords()
-                found = False
 
                 for entry in passwords:
-                    if entry[0] == website:
+                    if entry[0] == webshite:
                         decrypted_password = fs.decrypt_data(entry[2].encode())
                         messagebox.showwarning("User Details", f"Username: {entry[1]}, Password: {decrypted_password}")
                         found = True
