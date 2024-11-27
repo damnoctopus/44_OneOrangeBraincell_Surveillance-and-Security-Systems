@@ -68,6 +68,7 @@ def generate_qr_code(secret, user_identifier, issuer_name="MyPasswordManager"):
     qr = qrcode.make(uri)
     qr.save(qr_file)
     print(f"QR Code generated and saved as {qr_file}")
+    print("\nScan the QR Code using an authenticator app (e.g., Google Authenticator).")
     return qr_file
 
 
@@ -77,16 +78,28 @@ def validate_otp(secret, user_provided_otp):
     return totp.verify(user_provided_otp)
 
 
+import os
+
 def two_factor_auth():
     print("Two-Factor Authentication")
-    user_email = input("Enter your name to authenticate 2FA: ")
+    user_email = input("Enter your email to authenticate 2FA: ")
+
+    # Check if the file exists and read content
+    if os.path.exists('fileData/user.txt'):
+        with open('fileData/user.txt', 'r') as file:
+            file_content = file.read()
+
+        if user_email != file_content:
+            return False
+    else:
+        os.makedirs('fileData', exist_ok=True)
+        # Store the user_email in the file
+        with open('fileData/user.txt', 'w') as file:
+            file.write(user_email)
 
     # Step 1: Retrieve or Generate Secret and QR Code
     secret = generate_2fa_secret(user_email)
     qr_file = generate_qr_code(secret, user_email)
-
-    print("\nScan the QR Code using an authenticator app (e.g., Google Authenticator).")
-    print(f"The QR Code is located at: {qr_file}")
 
     # Step 2: OTP Validation
     for i in range(3):
@@ -100,3 +113,4 @@ def two_factor_auth():
     else:
         print("Failed to validate OTP after 3 attempts.")
         return False
+
