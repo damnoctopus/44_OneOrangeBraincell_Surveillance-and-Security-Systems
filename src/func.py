@@ -25,20 +25,29 @@ def check_strength(password):
         response_text = response.text.strip().lower()
 
         if "true" in response_text:
-            print("Password is strong!")
+            #print("Password is strong!")
+            return True
         elif "false" in response_text:
-            print("Password is weak.")
+            #print("Password is weak.")
             # Extract suggestions if available
             suggestions = response_text.split("false")[-1].strip()
             if suggestions:
-                print("Suggestions:", suggestions)
+                #print("Suggestions:", suggestions)
+                return suggestions
         else:
             print("Unexpected response from the model:", response_text)
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def Genstrongpass():
+    genai.configure(api_key="AIzaSyCO7y3n4NZHnRtdNnhjOYY7fmNS8VJtIQA")
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(
+        f"""Generate a strong password of 12 random characters that 
+        allowed characters :alphabets numbers and '@' '#' '!' '$' '&' 
+        only the generated password should be the ouput"""
+    )
+    response_text = response.text.strip().lower()
+    return response_text
 
-# Main
-check_strength("weakpass")  # Weak password example
-check_strength("Clown@382$%")  # Strong password example
