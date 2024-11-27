@@ -129,27 +129,31 @@ def setup_2fa():
 
             # Generate secret and QR code
             secret = tfa.generate_2fa_secret(user_email)
-            qr_file = tfa.generate_qr_code(secret, user_email)
+            file_path2 = f"fileData/{user_email}_2fa_qr.png"
+            os.makedirs(os.path.dirname(file_path2), exist_ok=True)
+            if not os.path.exists(file_path2):
+                qr_file = tfa.generate_qr_code(secret, user_email)
 
-            # Display QR code to the user
-            qr_window = tk.Toplevel()
-            qr_window.title("Scan QR Code")
-            qr_label = tk.Label(qr_window, text="Scan this QR code with your authenticator app:")
-            qr_label.pack(pady=10)
+                # Display QR code to the user
+                qr_window = tk.Toplevel()
+                qr_window.title("Scan QR Code")
+                qr_label = tk.Label(qr_window, text="Scan this QR code with your authenticator app:")
+                qr_label.pack(pady=10)
 
-            qr_image = Image.open(qr_file)
-            qr_photo = ImageTk.PhotoImage(qr_image)
-            qr_canvas = tk.Label(qr_window, image=qr_photo)
-            qr_canvas.image = qr_photo  # Keep a reference to avoid garbage collection
-            qr_canvas.pack(pady=10)
+                qr_image = Image.open(qr_file)
+                qr_photo = ImageTk.PhotoImage(qr_image)
+                qr_canvas = tk.Label(qr_window, image=qr_photo)
+                qr_canvas.image = qr_photo  # Keep a reference to avoid garbage collection
+                qr_canvas.pack(pady=10)
 
             # OTP validation
             for i in range(3):
                 user_otp = simpledialog.askstring("OTP", "Enter the OTP from your authenticator app:")
                 if tfa.validate_otp(secret, user_otp):
-                    messagebox.showinfo("Success", "Two-factor authentication has been set up successfully!")
+                    messagebox.showinfo("Success", "Successfully authenticated.")
                     factor_setup = True  # Update the global variable
-                    qr_window.destroy()
+                    if not os.path.exists(file_path2):
+                        qr_window.destroy()
                     return
                 else:
                     messagebox.showerror("Error", f"Invalid OTP. Attempt {i+1}/3.")
