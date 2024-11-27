@@ -21,6 +21,7 @@ def add_password():
 
         strength_return = fc.check_strength(password)
         if strength_return is True:
+            fs.generate_key()
             encrypted_password = fs.encrypt_data(password)
             # code to save the password details
             fs.save_password(website, username, encrypted_password)
