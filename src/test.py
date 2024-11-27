@@ -10,6 +10,7 @@ from PIL import Image, ImageTk
 
 factor_setup = False
 
+
 def add_password():
     def save_password():
         website = website_entry.get()
@@ -164,6 +165,7 @@ def setup_2fa():
             messagebox.showerror("Error", f"An error occurred while setting up 2FA:\n{str(e)}")
     else:
         messagebox.showinfo("Info", "Two-factor authentication is already set up.")
+
 
 def reset_2fa():
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset 2FA?")
