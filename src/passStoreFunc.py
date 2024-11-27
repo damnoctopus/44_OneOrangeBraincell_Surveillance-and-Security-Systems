@@ -1,6 +1,4 @@
-from cryptography.fernet import Fernet
-import os
-
+import shutil
 import os
 from cryptography.fernet import Fernet
 
@@ -51,3 +49,5 @@ def load_passwords():
     with open('fileData/passwords.txt', 'r') as file:
         return [line.strip().split('|') for line in file.readlines()]
 
+def reset2fa():
+    shutil.rmtree('fileData')

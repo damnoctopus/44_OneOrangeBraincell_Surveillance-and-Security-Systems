@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import passStoreFunc as fs
 import func as fc
-import random
+import os
 import string
 
 def add_password():
@@ -72,26 +72,25 @@ def setup_2fa():
     messagebox.showinfo("Setup 2FA", "Setup 2FA functionality placeholder.")
 
 def reset_2fa():
-    # Add functionality to reset 2FA here
-    messagebox.showinfo("Reset 2FA", "Reset 2FA functionality placeholder.")
+    confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset 2FA?")
+    if confirm:
+        try:
+            fs.reset2fa()  # Call the reset2fa function
+            messagebox.showinfo("Success", "2FA has been reset successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while resetting 2FA:\n{str(e)}")
+    else:
+        messagebox.showinfo("Cancelled", "2FA reset was cancelled.")
 
 def generate_strong_password():
-    def generate():
-        length = int(length_entry.get())
-        characters = string.ascii_letters + string.digits + string.punctuation
-        password = ''.join(random.choice(characters) for _ in range(length))
-        result_label.config(text=f"Generated Password: {password}")
 
-    generate_window = tk.Toplevel(root)
-    generate_window.title("Generate Strong Password")
+    strong_pass = fc.Genstrongpass()
+    #print to console
+    print(strong_pass)
+    # Display the password in a message box
+    messagebox.showinfo("Generated Password", f"Your strong password is:\n{strong_pass}")
 
-    tk.Label(generate_window, text="Password Length:").grid(row=0, column=0, padx=10, pady=5)
-    length_entry = tk.Entry(generate_window)
-    length_entry.grid(row=0, column=1, padx=10, pady=5)
 
-    tk.Button(generate_window, text="Generate", command=generate).grid(row=1, column=0, columnspan=2, pady=10)
-    result_label = tk.Label(generate_window, text="")
-    result_label.grid(row=2, column=0, columnspan=2, pady=10)
 
 def quit_app():
     root.quit()
