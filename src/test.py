@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 import passStoreFunc as fs
 import func as fc
+import tfa
 import os
-import string
+
 
 def add_password():
     def save_password():
@@ -48,15 +49,31 @@ def retrieve_password():
             messagebox.showerror("Error", "Website is required!")
             return
 
-        passwords = fs.load_passwords()
-        for entry in passwords:
-            if entry[0] == website:
-                decrypted_password = fs.decrypt_data(entry[2].encode())
-                messagebox.showinfo("Password Found", f"Username: {entry[1]}\nPassword: {decrypted_password}")
-                retrieve_window.destroy()
-                return
+        if factor_setup is True:
+            factor_verify = tfa.two_factor_auth()
+            if factor_verify:
+                passwords = fs.load_passwords()
+                found = False
 
-        messagebox.showwarning("Not Found", "No password found for that website.")
+                for entry in passwords:
+                    if entry[0] == website:
+                        decrypted_password = fs.decrypt_data(entry[2].encode())
+                        messagebox.showwarning("User Details", f"Username: {entry[1]}, Password: {decrypted_password}")
+                        found = True
+                        break
+
+                if not found:
+                    messagebox.showwarning("Not Found", "No password found for that website.")
+                    retrieve_window.destroy()
+            else:
+                messagebox.showwarning("Auth Error", "Failed to verify User.")
+                retrieve_window.destroy()
+
+        else:
+            messagebox.showwarning("Auth Error", "Two factor authentication not setup.")
+            retrieve_window.destroy()
+
+
 
     retrieve_window = tk.Toplevel(root)
     retrieve_window.title("Retrieve Password")
@@ -95,9 +112,17 @@ def generate_strong_password():
 def quit_app():
     root.quit()
 
+# Main body
+
+
+if not os.path.exists('fileData/secret.key'):
+    fs.generate_key()
+factor_setup = False
+
+
 # Main Window
 root = tk.Tk()
-root.title("PassStore Menu")
+root.title("Password Manager Menu")
 
 tk.Label(root, text="Welcome to PassStore", font=("Arial", 16)).pack(pady=10)
 
