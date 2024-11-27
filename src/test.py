@@ -1,9 +1,12 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 import passStoreFunc as fs
 import func as fc
 import tfa
 import os
+import pyotp
+import qrcode
+from PIL import Image, ImageTk
 
 
 def add_password():
@@ -87,29 +90,70 @@ def retrieve_password():
 
 
 def setup_2fa():
-    # Add functionality to setup 2FA here
-    global factor_setup  # Access the global variable to modify it
+    global factor_setup  # Access the global 2FA setup state
 
     if not factor_setup:
-        confirm = messagebox.askyesno("Set Up 2FA",
-                                      "Two-factor authentication is not set up. Would you like to set it up now?")
-        if confirm:
-            try:
-                factor_setup = tfa.two_factor_auth()  # Set up 2FA
-                messagebox.showinfo("Success", "Two-factor authentication has been set up.")
-            except Exception as e:
-                messagebox.showerror("Error", f"An error occurred while setting up 2FA:\n{str(e)}")
+        confirm = messagebox.askyesno(
+            "Set Up 2FA",
+            "Two-factor authentication is not set up. Would you like to set it up now?"
+        )
+        if not confirm:
+            return
+
+        try:
+            # Prompt user for their email
+            user_email = simpledialog.askstring("Email", "Enter your email for 2FA setup:")
+            if not user_email:
+                messagebox.showerror("Error", "Email is required to set up 2FA.")
+                return
+
+            # Check or store the user email
+            file_path = "fileData/user.txt"
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            if os.path.exists(file_path):
+                with open(file_path, "r") as file:
+                    stored_email = file.read()
+                if user_email != stored_email:
+                    messagebox.showerror("Error", "Email does not match the stored user.")
+                    return
+            else:
+                with open(file_path, "w") as file:
+                    file.write(user_email)
+
+            # Generate secret and QR code
+            secret = tfa.generate_2fa_secret(user_email)
+            qr_file = tfa.generate_qr_code(secret, user_email)
+
+            # Display QR code to the user
+            qr_window = tk.Toplevel()
+            qr_window.title("Scan QR Code")
+            qr_label = tk.Label(qr_window, text="Scan this QR code with your authenticator app:")
+            qr_label.pack(pady=10)
+
+            qr_image = Image.open(qr_file)
+            qr_photo = ImageTk.PhotoImage(qr_image)
+            qr_canvas = tk.Label(qr_window, image=qr_photo)
+            qr_canvas.image = qr_photo  # Keep a reference to avoid garbage collection
+            qr_canvas.pack(pady=10)
+
+            # OTP validation
+            for i in range(3):
+                user_otp = simpledialog.askstring("OTP", "Enter the OTP from your authenticator app:")
+                if tfa.validate_otp(secret, user_otp):
+                    messagebox.showinfo("Success", "Two-factor authentication has been set up successfully!")
+                    factor_setup = True
+                    qr_window.destroy()
+                    return
+                else:
+                    messagebox.showerror("Error", f"Invalid OTP. Attempt {i+1}/3.")
+
+            messagebox.showerror("Error", "Failed to validate OTP after 3 attempts.")
+            qr_window.destroy()
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while setting up 2FA:\n{str(e)}")
     else:
-        confirm = messagebox.askyesno("Reset 2FA",
-                                      "Two-factor authentication is already set up. Would you like to reset it?")
-        if confirm:
-            try:
-                factor_setup = tfa.two_factor_auth()  # Reset 2FA
-                messagebox.showinfo("Success", "Two-factor authentication has been reset.")
-            except Exception as e:
-                messagebox.showerror("Error", f"An error occurred while resetting 2FA:\n{str(e)}")
-        else:
-            messagebox.showinfo("No Action Taken", "2FA setup remains unchanged.")
+        messagebox.showinfo("Info", "Two-factor authentication is already set up.")
 
 
 def reset_2fa():
