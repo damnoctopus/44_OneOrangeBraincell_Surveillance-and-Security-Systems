@@ -79,7 +79,7 @@ def validate_otp(secret, user_provided_otp):
 
 def two_factor_auth():
     print("Two-Factor Authentication")
-    user_email = input("Enter your email to authenticate 2FA: ")
+    user_email = input("Enter your name to authenticate 2FA: ")
 
     # Step 1: Retrieve or Generate Secret and QR Code
     secret = generate_2fa_secret(user_email)
@@ -93,14 +93,10 @@ def two_factor_auth():
         user_otp = input("Enter the OTP from your authenticator app: ")
 
         if validate_otp(secret, user_otp):
-            print("OTP Verified! Two-Factor Authentication setup is successful.")
+            print("OTP Verified! Two-Factor has been Authenticated.")
             return True
         else:
             print("Invalid OTP. Please try again.")
     else:
         print("Failed to validate OTP after 3 attempts.")
         return False
-
-
-if __name__ == "__main__":
-    two_factor_auth()
