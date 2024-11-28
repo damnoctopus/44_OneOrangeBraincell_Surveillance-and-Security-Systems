@@ -4,8 +4,7 @@ import passStoreFunc as fs
 import func as fc
 import tfa
 import os
-import pyotp
-import qrcode
+import customtkinter
 from PIL import Image, ImageTk
 
 factor_setup = False
@@ -184,6 +183,8 @@ def reset_2fa():
 def generate_strong_password():
 
     strong_pass = fc.Genstrongpass()
+    # print to console
+    print(strong_pass)
     # Display the password in a message box
     messagebox.showinfo("Generated Password", f"Your strong password is:\n{strong_pass}")
 
@@ -200,16 +201,19 @@ factor_setup = False
 
 
 # Main Window
-root = tk.Tk()
+root = customtkinter.CTk()
 root.title("Password Manager Menu")
+customtkinter.set_appearance_mode("System")
+customtkinter.set_default_color_theme("blue")
 
-tk.Label(root, text="Welcome to PassManager", font=("Arial", 16)).pack(pady=10)
 
-tk.Button(root, text="1. Add Password", command=add_password, width=30).pack(pady=5)
-tk.Button(root, text="2. Retrieve Password", command=retrieve_password, width=30).pack(pady=5)
-tk.Button(root, text="3. Setup 2FA", command=setup_2fa, width=30).pack(pady=5)
-tk.Button(root, text="4. Reset 2FA", command=reset_2fa, width=30).pack(pady=5)
-tk.Button(root, text="5. Generate Strong Password", command=generate_strong_password, width=30).pack(pady=5)
-tk.Button(root, text="6. Quit", command=quit_app, width=30).pack(pady=5)
+customtkinter.CTkLabel(root, text="Welcome to PassManager", font=("Arial", 16)).pack(pady=10)
+
+customtkinter.CTkButton(root, text="1. Add Password", command=add_password, width=30).pack(pady=5)
+customtkinter.CTkButton(root, text="2. Retrieve Password", command=retrieve_password, width=30).pack(pady=5)
+customtkinter.CTkButton(root, text="3. Setup 2FA", command=setup_2fa, width=30).pack(pady=5)
+customtkinter.CTkButton(root, text="4. Reset 2FA", command=reset_2fa, width=30).pack(pady=5)
+customtkinter.CTkButton(root, text="5. Generate Strong Password", command=generate_strong_password, width=30).pack(pady=5)
+customtkinter.CTkButton(root, text="6. Quit", command=quit_app, width=30).pack(pady=5)
 
 root.mainloop()
