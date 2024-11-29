@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 def check_strength(password):
     # Configure API
-    genai.configure(api_key="AIzaSyCO7y3n4NZHnRtdNnhjOYY7fmNS8VJtIQA")
+    genai.configure(api_key="Your API Key Here")
     model = genai.GenerativeModel("gemini-1.5-flash")
 
     try:
