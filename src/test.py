@@ -165,7 +165,7 @@ def setup_2fa():
     else:
         messagebox.showinfo("Info", "Two-factor authentication is already set up.")
 
-
+# new line
 def reset_2fa():
     confirm = messagebox.askyesno("Confirm Reset", "Are you sure you want to reset 2FA?")
     if confirm:
@@ -188,10 +188,6 @@ def generate_strong_password():
     # Display the password in a message box
     messagebox.showinfo("Generated Password", f"Your strong password is:\n{strong_pass}")
 
-
-def quit_app():
-    root.quit()
-
 # Main body
 
 
@@ -201,19 +197,3 @@ factor_setup = False
 
 
 # Main Window
-root = customtkinter.CTk()
-root.title("Password Manager Menu")
-customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("blue")
-
-
-customtkinter.CTkLabel(root, text="Welcome to PassManager", font=("Arial", 16)).pack(pady=10)
-
-customtkinter.CTkButton(root, text="1. Add Password", command=add_password, width=30).pack(pady=5)
-customtkinter.CTkButton(root, text="2. Retrieve Password", command=retrieve_password, width=30).pack(pady=5)
-customtkinter.CTkButton(root, text="3. Setup 2FA", command=setup_2fa, width=30).pack(pady=5)
-customtkinter.CTkButton(root, text="4. Reset 2FA", command=reset_2fa, width=30).pack(pady=5)
-customtkinter.CTkButton(root, text="5. Generate Strong Password", command=generate_strong_password, width=30).pack(pady=5)
-customtkinter.CTkButton(root, text="6. Quit", command=quit_app, width=30).pack(pady=5)
-
-root.mainloop()
