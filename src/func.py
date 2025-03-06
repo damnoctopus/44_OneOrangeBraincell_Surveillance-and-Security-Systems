@@ -6,6 +6,10 @@ def check_strength(password):
     genai.configure(api_key="Your API Key Here")
     model = genai.GenerativeModel("gemini-1.5-flash")
 
+
+
+
+
     try:
         # API call with timeout
         response = model.generate_content(
